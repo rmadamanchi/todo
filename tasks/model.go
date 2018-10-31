@@ -1,7 +1,7 @@
-package app
+package tasks
 
 type Task struct {
 	Id    int16  `json:"id"`
 	Title string `json:"title"`
-	Done  string `json:"boolean"`
+	Done  bool   `json:"done"`
 }
