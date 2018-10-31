@@ -13,7 +13,7 @@ func main() {
 	router.HandleFunc("/", homeHandler).Methods("GET")
 
 	tasksRouter := router.PathPrefix("/tasks").Subrouter()
-	tasks.RegisterHanders(tasksRouter)
+	tasks.RegisterHandlers(tasksRouter)
 
 	fmt.Println("Starting Server")
 	log.Fatal(http.ListenAndServe(":8000", router))

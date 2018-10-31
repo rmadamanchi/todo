@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func RegisterHanders(router *mux.Router) {
+func RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("", HandleGetTasks).Methods("GET")
 }
 
