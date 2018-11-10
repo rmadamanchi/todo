@@ -8,25 +8,32 @@ type Repository interface {
 	create(t Task)
 }
 
-type memoryRepository []Task
+type memoryMapRepository map[int16]Task
 
-func (r *memoryRepository) all() []Task {
-	return *r
+func (r *memoryMapRepository) all() []Task {
+	var tasks []Task
+	for _, task := range *r {
+		tasks = append(tasks, task)
+	}
+	return tasks
 }
 
-func (r memoryRepository) get(id int16) Task {
-	return Task{}
+func (r memoryMapRepository) get(id int16) Task {
+	return r[id]
 }
 
-func (r memoryRepository) update(t Task) {
+func (r memoryMapRepository) update(t Task) {
+	r[t.Id] = t
 }
 
-func (r memoryRepository) delete(id int16) {
+func (r memoryMapRepository) delete(id int16) {
+	delete(r, id)
 }
 
-func (r memoryRepository) create(t Task) {
+func (r memoryMapRepository) create(t Task) {
+	r[t.Id] = t
 }
 
 func NewRepository() Repository {
-	return new(memoryRepository)
+	return new(memoryMapRepository)
 }
