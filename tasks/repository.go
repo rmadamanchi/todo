@@ -1,5 +1,11 @@
 package tasks
 
+type RepositoryType int
+
+const (
+	MemoryMap RepositoryType = iota
+)
+
 type Repository interface {
 	all() []Task
 	get(id int16) Task
@@ -7,6 +13,8 @@ type Repository interface {
 	delete(id int16)
 	create(t Task)
 }
+
+var counter int16 = 1
 
 type memoryMapRepository map[int16]Task
 
@@ -31,9 +39,16 @@ func (r memoryMapRepository) delete(id int16) {
 }
 
 func (r memoryMapRepository) create(t Task) {
+	t.Id = counter
 	r[t.Id] = t
+	counter += 1
 }
 
-func NewRepository() Repository {
-	return new(memoryMapRepository)
+func NewRepository(repositoryType RepositoryType) Repository {
+	switch repositoryType {
+	case MemoryMap:
+		return new(memoryMapRepository)
+	default:
+		return nil
+	}
 }
