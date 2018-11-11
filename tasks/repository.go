@@ -19,7 +19,7 @@ var counter int16 = 1
 type memoryMapRepository map[int16]Task
 
 func (r *memoryMapRepository) all() []Task {
-	var tasks []Task
+	var tasks = make([]Task, len(*r))
 	for _, task := range *r {
 		tasks = append(tasks, task)
 	}

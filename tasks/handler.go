@@ -6,14 +6,15 @@ import (
 	"net/http"
 )
 
+var repository = NewRepository(MemoryMap)
+
 func RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("", handleGetTasks).Methods("GET")
 }
 
 func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(writer).Encode([]Task{
-		{Id: 1, Title: "Get Milk", Done: false},
-		{Id: 1, Title: "Get Milk", Done: false},
-	})
+	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(repository.all())
 }
