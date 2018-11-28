@@ -1,5 +1,7 @@
 package tasks
 
+import "fmt"
+
 type RepositoryType int
 
 const (
@@ -9,45 +11,46 @@ const (
 type Repository interface {
 	all() []Task
 	get(id int16) Task
-	update(t Task)
+	update(t *Task)
 	delete(id int16)
-	create(t Task)
+	create(t *Task)
 }
 
 var counter int16 = 1
 
 type memoryMapRepository map[int16]Task
 
-func (r *memoryMapRepository) all() []Task {
-	var tasks = make([]Task, len(*r))
-	for _, task := range *r {
+func (repository *memoryMapRepository) all() []Task {
+	var tasks []Task
+	for _, task := range *repository {
 		tasks = append(tasks, task)
 	}
 	return tasks
 }
 
-func (r memoryMapRepository) get(id int16) Task {
-	return r[id]
+func (repository memoryMapRepository) get(id int16) Task {
+	return repository[id]
 }
 
-func (r memoryMapRepository) update(t Task) {
-	r[t.Id] = t
+func (repository memoryMapRepository) update(t *Task) {
+	repository[t.Id] = *t
 }
 
-func (r memoryMapRepository) delete(id int16) {
-	delete(r, id)
+func (repository memoryMapRepository) delete(id int16) {
+	delete(repository, id)
 }
 
-func (r memoryMapRepository) create(t Task) {
+func (repository memoryMapRepository) create(t *Task) {
+	fmt.Print(repository)
 	t.Id = counter
-	r[t.Id] = t
+	repository[t.Id] = *t
 	counter += 1
 }
 
 func NewRepository(repositoryType RepositoryType) Repository {
 	switch repositoryType {
 	case MemoryMap:
-		return new(memoryMapRepository)
+		return &memoryMapRepository{}
 	default:
 		return nil
 	}

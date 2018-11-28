@@ -15,7 +15,7 @@ func main() {
 	tasksRouter := router.PathPrefix("/tasks").Subrouter()
 	tasks.RegisterHandlers(tasksRouter)
 
-	fmt.Println("Starting Server")
+	fmt.Println("Starting Server on port 8080")
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
 

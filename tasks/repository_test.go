@@ -5,9 +5,9 @@ import "testing"
 func TestMemoryMapRepository(t *testing.T) {
 	repository := NewRepository(MemoryMap)
 
-	repository.create(Task{Title: "Get Milk"})
-	repository.create(Task{Title: "Get Bread"})
-	repository.create(Task{Title: "Fill Gas", Done: true})
+	repository.create(&Task{Title: "Get Milk"})
+	repository.create(&Task{Title: "Get Bread"})
+	repository.create(&Task{Title: "Fill Gas", Done: true})
 
 	all := repository.all()
 	assert(t, len(all), 3)
