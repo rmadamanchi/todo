@@ -155,13 +155,9 @@ import (
 
 var db = [2]Task{
 	Task{Id: 1, Title: "Get Bread"},
-	Task{Id: 1, Title: "Get Milk"},
+	Task{Id: 2, Title: "Get Milk"},
 }
 
-var db = [2]Task{
-	Task{Id: 1, Title: "Get Bread"},
-	Task{Id: 1, Title: "Get Milk"},
-}
 
 func RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("", handleGetTasks).Methods("GET")
@@ -179,7 +175,7 @@ var db [2]Task
 
 func init() {
 	db[0] = Task{Id: 1, Title: "Get Bread"}
-	db[1] = Task{Id: 1, Title: "Get Bread"}
+	db[1] = Task{Id: 2, Title: "Get Bread"}
 }
 ```
 
@@ -191,7 +187,7 @@ Omitting the array length makes it a slice
 ```
 var db = []Task{
 	Task{Id: 1, Title: "Get Bread"},
-	Task{Id: 1, Title: "Get Milk"},
+	Task{Id: 2, Title: "Get Milk"},
 }
 ```
 
@@ -216,7 +212,7 @@ func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body)
 	if err := decoder.Decode(&task); err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
-		response, _ := json.Marshal(map[string]string{"error": ""})
+		response, _ := json.Marshal(map[string]string{"error": "Invalid Request Body - " + err.Error())})
 		writer.Write(response)
 		return
 	}
@@ -284,3 +280,20 @@ taskCounter += 1
 ...
 db = append(db, *task)
 ```
+
+## Extract a repository (`tasks/repository.go`)
+
+```go
+package tasks
+
+type Repository interface {
+	all() []Task
+	get(id int16) Task
+	update(t *Task)
+	delete(id int16)
+	create(t *Task)
+}
+```
+
+
+
