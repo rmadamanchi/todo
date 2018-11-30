@@ -296,7 +296,9 @@ taskCounter += 1
 db = append(db, *task)
 ```
 
-## Extract a repository (`tasks/repository.go`)
+## Extract a repository
+
+Create `tasks/repository.go`
 
 ```go
 package tasks
