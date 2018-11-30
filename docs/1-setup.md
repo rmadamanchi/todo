@@ -1,8 +1,8 @@
 ### Create app folders
 
 ```bash
-mkdir ~/src/github.com/<username>/todo
-cd  ~/src/github.com/<username>/todo
+mkdir ~/go/src/github.com/<username>/todo
+cd  ~/go/src/github.com/<username>/todo
 ```
 
 ### Hello World
