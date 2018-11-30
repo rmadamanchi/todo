@@ -5,15 +5,15 @@ A simple todo application to learn Golang and more
 
 ### Create app folders
 
-```
+```bash
 mkdir ~/src/github.com/<username>/todo
 cd  ~/src/github.com/<username>/todo
 ```
 
 ### Hello World
-`vi main.go`
+Create `main.go`
 
-```
+```go
 import "fmt"
 
 func main() {
@@ -22,40 +22,40 @@ func main() {
 ```
 
 Run main.go
-```
+```bash
 go run main.go
 ```
 
 Fix package
-```
+```go
 package todo 
 ```
 
 Fix package
-```
+```go
 package main
 ```
 
 Fix package
-```
+```go
 go run main.go
 ```
 
 ### Dep Project with Mux
 
 Install Dep
-```
+```bash
 // can also install via curl or brew
 go get -u github.com/golang/dep/cmd/dep
 ```
 
-```
+```bash
 cd ~/src/github.com/<username>/todo
 dep init
 dep ensure https://github.com/gorilla/mux
 ```
 
-```
+```go
 package main
 
 import (
@@ -84,7 +84,7 @@ Create a new package `tasks`
 
 Create `tasks/model.go` to hold model structs
 
-```
+```go
 package main
 
 type Task struct {
@@ -94,9 +94,9 @@ type Task struct {
 }
 ```
 
-Add a GET handler for `/tasks`
+Add a GET handler for `/tasks` in `main.go`
 
-```
+```go
 router.HandleFunc("/tasks", handleGetTasks).Methods("GET")
 
 func handleGetTasks(w http.ResponseWriter, _ *http.Request) {
@@ -108,11 +108,25 @@ func handleGetTasks(w http.ResponseWriter, _ *http.Request) {
 }
 ```
 
+Now run using
+
+```bash
+go run *.go
+```
+
+```bash
+go build 
+```
+
+```bash
+go install
+```
+
 Create a `tasks` package and move `model.go` into it
 
 Create `tasks/handlers.go` and move handler logic into it
 
-```
+```go
 package tasks
 
 import (
@@ -137,14 +151,14 @@ func handleGetTasks(w http.ResponseWriter, _ *http.Request) {
 
 Update `main.go` to use call `tasks.RegisterHandlers`
 
-```
+```go
 tasksRouter := router.PathPrefix("/tasks").Subrouter()
 tasks.RegisterHandlers(tasksRouter)
 ```
 
 Extract an in-memory db with an array
 
-```
+```go
 package tasks
 
 import (
@@ -170,7 +184,7 @@ func handleGetTasks(w http.ResponseWriter, _ *http.Request) {
 ```
 
 You can also initialize the array like this using the package init function
-```
+```go
 var db [2]Task
 
 func init() {
@@ -179,12 +193,13 @@ func init() {
 }
 ```
 
+
 ## POST Action
 You can't add elements to array (you'd have to recreate and copy over). Use a slice instead.
 
 Omitting the array length makes it a slice
 
-```
+```go
 var db = []Task{
 	Task{Id: 1, Title: "Get Bread"},
 	Task{Id: 2, Title: "Get Milk"},
@@ -193,7 +208,7 @@ var db = []Task{
 
 or using a package init method
 
-```
+```go
 var db []Task
 
 func init() {
@@ -204,7 +219,7 @@ func init() {
 
 Add a POST Action
 
-```
+```go
 router.HandleFunc("", handlePostTask).Methods("POST")
 
 func handlePostTask(writer http.ResponseWriter, request *http.Request) {
@@ -227,7 +242,7 @@ func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 
 Let's extract methods to read input body and send Responses
 
-```
+```go
 func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 	task, err := readBody(request)
 	if err != nil {
@@ -267,13 +282,13 @@ func sendResponse(writer http.ResponseWriter, code int, body interface{}) {
 
 Add a package level taskCounter to assign ids
 
-```
+```go
 var taskCounter int16 = 1
 ```
 
 Assign the id before saving a task in `handlePostTask`
 
-```
+```go
 task.Id = taskCounter
 taskCounter += 1
 
@@ -294,6 +309,4 @@ type Repository interface {
 	create(t *Task)
 }
 ```
-
-
 
