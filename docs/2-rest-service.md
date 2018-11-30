@@ -185,7 +185,7 @@ func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body)
 	if err := decoder.Decode(&task); err != nil {
 		writer.WriteHeader(http.StatusBadRequest)
-		response, _ := json.Marshal(map[string]string{"error": "Invalid Request Body - " + err.Error())})
+		response, _ := json.Marshal(map[string]string{"error": "Invalid Request Body - " + err.Error()})
 		writer.Write(response)
 		return
 	}
