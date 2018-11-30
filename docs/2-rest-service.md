@@ -57,6 +57,7 @@ Add a GET handler for `/tasks` in `main.go`
 ```go
 router.HandleFunc("/tasks", handleGetTasks).Methods("GET")
 
+...
 func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
   writer.WriteHeader(http.StatusOK)
   json.NewEncoder(writer).Encode([]Task {
@@ -90,7 +91,6 @@ package tasks
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/rmadamanchi/todo/tasks"
 	"net/http"
 )
 
@@ -100,9 +100,9 @@ func RegisterHandlers(router *mux.Router) {
 
 func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
 	writer.WriteHeader(http.StatusOK)
-	json.NewEncoder(writer).Encode([]tasks.Task {
-		tasks.Task {Id: 1, Title: "Get Milk"},
-		tasks.Task {Id: 2, Title: "Get Bread"},
+	json.NewEncoder(writer).Encode([]Task {
+		Task {Id: 1, Title: "Get Milk"},
+		Task {Id: 2, Title: "Get Bread"},
 	})
 }
 ```
