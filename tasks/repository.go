@@ -19,30 +19,30 @@ type memoryMapRepository struct {
 	idCounter int16
 }
 
-func (r memoryMapRepository) all() []Task {
+func (repository memoryMapRepository) all() []Task {
 	var tasks []Task
-	for _, task := range r.db {
+	for _, task := range repository.db {
 		tasks = append(tasks, task)
 	}
 	return tasks
 }
 
-func (r memoryMapRepository) get(id int16) Task {
-	return r.db[id]
+func (repository memoryMapRepository) get(id int16) Task {
+	return repository.db[id]
 }
 
-func (r memoryMapRepository) update(t *Task) {
-	r.db[t.Id] = *t
+func (repository memoryMapRepository) update(ask *Task) {
+	repository.db[ask.Id] = *ask
 }
 
-func (r memoryMapRepository) delete(id int16) {
-	delete(r.db, id)
+func (repository memoryMapRepository) delete(id int16) {
+	delete(repository.db, id)
 }
 
-func (r *memoryMapRepository) create(t *Task) {
-	t.Id = r.idCounter
-	r.db[t.Id] = *t
-	r.idCounter += 1
+func (repository *memoryMapRepository) create(task *Task) {
+	task.Id = repository.idCounter
+	repository.db[task.Id] = *task
+	repository.idCounter += 1
 }
 
 func NewRepository(repositoryType RepositoryType) Repository {

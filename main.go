@@ -19,7 +19,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
 
-func homeHandler(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Yet Another Todo App!")
+func homeHandler(writer http.ResponseWriter, _ *http.Request) {
+	writer.WriteHeader(http.StatusOK)
+	fmt.Fprintf(writer, "Yet Another Todo App!")
 }

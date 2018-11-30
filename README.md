@@ -72,9 +72,9 @@ func main() {
   http.ListenAndServe(":8000", router)
 }
 
-func handleHome(w http.ResponseWriter, _ *http.Request) {
-  w.WriteHeader(http.StatusOK)
-  fmt.Fprintf(w, "Yet Another Todo App!")
+func handleHome(writer http.ResponseWriter, _ *http.Request) {
+  writer.WriteHeader(http.StatusOK)
+  fmt.Fprintf(writer, "Yet Another Todo App!")
 }
 ```
 
@@ -99,9 +99,9 @@ Add a GET handler for `/tasks` in `main.go`
 ```go
 router.HandleFunc("/tasks", handleGetTasks).Methods("GET")
 
-func handleGetTasks(w http.ResponseWriter, _ *http.Request) {
-  w.WriteHeader(http.StatusOK)
-  json.NewEncoder(w).Encode([]Task {
+func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
+  writer.WriteHeader(http.StatusOK)
+  json.NewEncoder(writer).Encode([]Task {
     Task {Id: 1, Title: "Get Milk"},
     Task {Id: 2, Title: "Get Bread"},
   })
@@ -140,9 +140,9 @@ func RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("", handleGetTasks).Methods("GET")
 }
 
-func handleGetTasks(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode([]tasks.Task {
+func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode([]tasks.Task {
 		tasks.Task {Id: 1, Title: "Get Milk"},
 		tasks.Task {Id: 2, Title: "Get Bread"},
 	})
@@ -177,9 +177,9 @@ func RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("", handleGetTasks).Methods("GET")
 }
 
-func handleGetTasks(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(db)
+func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
+	writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(writer).Encode(db)
 }
 ```
 
@@ -243,6 +243,11 @@ func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 Let's extract methods to read input body and send Responses
 
 ```go
+func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
+	writer.WriteHeader(http.StatusOK)
+	sendJson(writer, repository.all())
+}
+
 func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 	task, err := readBody(request)
 	if err != nil {
@@ -312,3 +317,113 @@ type Repository interface {
 }
 ```
 
+Create memoryRepository in `tasks/repository.go` as a `Repository` implementation. Notice the pointer receiver
+
+```go
+type memoryMapRepository struct {
+	db        map[int16]Task
+	idCounter int16
+}
+
+func (repository memoryMapRepository) all() []Task {
+	var tasks []Task
+	for _, task := range repository.db {
+		tasks = append(tasks, task)
+	}
+	return tasks
+}
+
+func (repository memoryMapRepository) get(id int16) Task {
+	return repository.db[id]
+}
+
+func (repository memoryMapRepository) update(ask *Task) {
+	repository.db[ask.Id] = *ask
+}
+
+func (repository memoryMapRepository) delete(id int16) {
+	delete(repository.db, id)
+}
+
+func (repository *memoryMapRepository) create(task *Task) {
+	task.Id = repository.idCounter
+	repository.db[task.Id] = *task
+	repository.idCounter += 1
+}
+
+```
+
+Create a factory method to create a `Repository` instance 
+```go
+type RepositoryType int
+
+const (
+	MemoryMap RepositoryType = iota
+)
+
+func NewRepository(repositoryType RepositoryType) Repository {
+	switch repositoryType {
+	case MemoryMap:
+		return &memoryMapRepository{db: make(map[int16]Task), idCounter: 1}
+	default:
+		return nil
+	}
+}
+```
+
+Create a test `tests/repository_test.go`
+
+```go
+package tasks
+
+import "testing"
+
+func TestMemoryMapRepository(t *testing.T) {
+	repository := NewRepository(MemoryMap)
+
+	repository.create(&Task{Title: "Get Milk"})
+	repository.create(&Task{Title: "Get Bread"})
+	repository.create(&Task{Title: "Fill Gas", Done: true})
+
+	all := repository.all()
+	assert(t, len(all), 3)
+
+	task := repository.get(1)
+	assert(t, task.Title, "Get Milk")
+}
+
+func assert(t *testing.T, a interface{}, b interface{}) {
+	if a != b {
+		t.Fatalf("%s != %s", a, b)
+	}
+}
+```
+
+Run the tests using
+
+```bash
+go test
+```
+
+
+Update `handlers.go` to use the new repository
+
+```go
+var repository = NewRepository(MemoryMap)
+
+func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
+	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	sendJson(w, repository.all())
+}
+
+func handlePostTask(writer http.ResponseWriter, request *http.Request) {
+	task, err := readBody(request)
+	if err != nil {
+		sendError(writer, http.StatusBadRequest, "Invalid Request Body - "+err.Error())
+		return
+	}
+
+	repository.create(task)
+	sendJson(writer, task)
+}
+```
