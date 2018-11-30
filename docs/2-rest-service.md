@@ -10,7 +10,7 @@ go get -u github.com/golang/dep/cmd/dep
 ```bash
 cd ~/src/github.com/<username>/todo
 dep init
-dep ensure https://github.com/gorilla/mux
+dep ensure -add github.com/gorilla/mux
 ```
 
 ```go
@@ -40,7 +40,7 @@ func handleHome(writer http.ResponseWriter, _ *http.Request) {
 
 Create a new package `tasks`
 
-Create `tasks/model.go` to hold model structs
+Create `model.go` to hold model structs
 
 ```go
 package main
