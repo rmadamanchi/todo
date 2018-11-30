@@ -271,7 +271,7 @@ Add a package level taskCounter to assign ids
 var taskCounter int16 = 1
 ```
 
-Assign the id before saving a task in `handlePostTask`
+1Assign the id before saving tasks in `handlePostTask`
 
 ```
 task.Id = taskCounter
@@ -281,7 +281,9 @@ taskCounter += 1
 db = append(db, *task)
 ```
 
-## Extract a repository (`tasks/repository.go`)
+## Extract a repository
+
+Create `tasks/repository.go`
 
 ```go
 package tasks
@@ -294,6 +296,3 @@ type Repository interface {
 	create(t *Task)
 }
 ```
-
-
-
