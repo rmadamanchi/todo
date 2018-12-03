@@ -1,5 +1,7 @@
 package tasks
 
+import "errors"
+
 type RepositoryType int
 
 const (
@@ -47,12 +49,12 @@ func (repository *memoryMapRepository) create(task *Task) {
 	repository.idCounter += 1
 }
 
-func NewRepository(repositoryType RepositoryType) Repository {
+func NewRepository(repositoryType RepositoryType) (Repository, error) {
 	switch repositoryType {
 	case MemoryMap:
 		// https://stackoverflow.com/a/40824044
-		return &memoryMapRepository{db: make(map[int16]Task), idCounter: 1}
+		return &memoryMapRepository{db: make(map[int16]Task), idCounter: 1}, nil
 	default:
-		return nil
+		return nil, errors.New("Unknown Repository Type")
 	}
 }

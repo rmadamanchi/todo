@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-var repository = NewRepository(MemoryMap)
+var repository, _ = NewRepository(MemoryMap)
 
 func RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("", handleGetTasks).Methods("GET")

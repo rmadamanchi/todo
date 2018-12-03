@@ -319,14 +319,16 @@ const (
 	MemoryMap RepositoryType = iota
 )
 
-func NewRepository(repositoryType RepositoryType) Repository {
+func NewRepository(repositoryType RepositoryType) (Repository, error) {
 	switch repositoryType {
 	case MemoryMap:
-		return &memoryMapRepository{db: make(map[int16]Task), idCounter: 1}
+		// https://stackoverflow.com/a/40824044
+		return &memoryMapRepository{db: make(map[int16]Task), idCounter: 1}, nil
 	default:
-		return nil
+		return nil, errors.New("Unknown Repository Type")
 	}
 }
+
 ```
 
 Create a test `tests/repository_test.go`
@@ -367,10 +369,11 @@ go test
 Update `handlers.go` to use the new repository
 
 ```go
-var repository = NewRepository(MemoryMap)
+var repository, _ = NewRepository(MemoryMap)
+
+...
 
 func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
-	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	sendJson(w, repository.all())
 }
 
@@ -385,3 +388,8 @@ func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 	sendJson(writer, task)
 }
 ```
+
+## PUT and DELETE Actions
+
+
+## Validations
