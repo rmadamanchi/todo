@@ -19,11 +19,11 @@ func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
 	sendJson(writer, repository.all())
 }
 
-func handleGetTask(w http.ResponseWriter, r *http.Request) {
+func handleGetTask(writer http.ResponseWriter, _ *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.ParseInt(vars["id"], 10, 16)
 	if err == nil {
-		w.WriteHeader(http.StatusBadRequest)
+		sendError(writer, http.StatusBadRequest, "Bad Id - " + vars["id"])
 	}
 	task := repository.get(int16(id))
 
@@ -34,7 +34,7 @@ func handleGetTask(w http.ResponseWriter, r *http.Request) {
 func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 	task, err := readBody(request)
 	if err != nil {
-		sendError(writer, http.StatusBadRequest, "Invalid Request Body - "+err.Error())
+		sendError(writer, http.StatusBadRequest, "Invalid Request Body - " + err.Error())
 		return
 	}
 
