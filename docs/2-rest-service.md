@@ -203,7 +203,7 @@ Let's extract methods to read input body and send Responses
 ```go
 func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
 	writer.WriteHeader(http.StatusOK)
-	sendJson(writer, repository.all())
+	sendJson(writer, db)
 }
 
 func handlePostTask(writer http.ResponseWriter, request *http.Request) {
