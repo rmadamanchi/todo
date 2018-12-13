@@ -259,6 +259,8 @@ taskCounter += 1
 db = append(db, *task)
 ```
 
+Since we're starting the counter at 1, go ahead and delete the `init` method that initializes the array with initial elements.
+
 ## Extract a repository
 
 Create `tasks/repository.go`
