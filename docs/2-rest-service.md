@@ -203,7 +203,7 @@ Let's extract methods to read input body and send Responses
 ```go
 func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
 	writer.WriteHeader(http.StatusOK)
-	sendJson(writer, repository.all())
+	sendJson(writer, db)
 }
 
 func handlePostTask(writer http.ResponseWriter, request *http.Request) {
@@ -258,6 +258,8 @@ taskCounter += 1
 ...
 db = append(db, *task)
 ```
+
+Since we're starting the counter at 1, go ahead and delete the `init` method that initializes the array with initial elements.
 
 ## Extract a repository
 
