@@ -7,9 +7,7 @@ import (
 	"strconv"
 )
 
-var repository, _ = NewRepository(MemoryMap)
-
-func RegisterHandlers(router *mux.Router) {
+func RegisterApiHandlers(router *mux.Router) {
 	router.HandleFunc("", handleGetTasks).Methods("GET")
 	router.HandleFunc("", handlePostTask).Methods("POST")
 	router.HandleFunc("/{id}", handleGetTask).Methods("GET")
@@ -19,22 +17,22 @@ func handleGetTasks(writer http.ResponseWriter, _ *http.Request) {
 	sendJson(writer, repository.all())
 }
 
-func handleGetTask(writer http.ResponseWriter, _ *http.Request) {
-	vars := mux.Vars(r)
+func handleGetTask(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
 	id, err := strconv.ParseInt(vars["id"], 10, 16)
 	if err == nil {
-		sendError(writer, http.StatusBadRequest, "Bad Id - " + vars["id"])
+		sendError(writer, http.StatusBadRequest, "Bad Id - "+vars["id"])
 	}
 	task := repository.get(int16(id))
 
-	sendJson(w, task)
-	json.NewEncoder(w).Encode(task)
+	sendJson(writer, task)
+	_ = json.NewEncoder(writer).Encode(task)
 }
 
 func handlePostTask(writer http.ResponseWriter, request *http.Request) {
 	task, err := readBody(request)
 	if err != nil {
-		sendError(writer, http.StatusBadRequest, "Invalid Request Body - " + err.Error())
+		sendError(writer, http.StatusBadRequest, "Invalid Request Body - "+err.Error())
 		return
 	}
 
@@ -63,5 +61,5 @@ func sendResponse(writer http.ResponseWriter, code int, body interface{}) {
 	response, _ := json.Marshal(body)
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(code)
-	writer.Write(response)
+	_, _ = writer.Write(response)
 }
