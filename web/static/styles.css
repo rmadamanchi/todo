@@ -1,0 +1,8 @@
+
+body {
+    margin: 1em;
+}
+
+table.tasks {
+    max-width: 400px;
+}

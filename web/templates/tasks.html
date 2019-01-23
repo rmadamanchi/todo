@@ -1,7 +1,18 @@
 {{ define "content" }}
-    <div class="tasks">
+    <table class="tasks">
+        <thead>
+        <tr>
+            <th>Task</th>
+            <th>Done</th>
+        </tr>
+        </thead>
+        <tbody>
         {{range .}}
-            <div class="task">{{.Title}}</div>
+            <tr>
+                <td>{{.Title}}</td>
+                <td><input type="checkbox" {{if .Done}}checked="checked"{{end}}/></td>
+            </tr>
         {{end}}
-    </div>
+        </tbody>
+    </table>
 {{end}}

@@ -6,6 +6,9 @@ import (
 	"github.com/rmadamanchi/todo/internal/tasks"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -18,8 +21,18 @@ func main() {
 	tasksUiRouter := router.PathPrefix("/ui/tasks").Subrouter()
 	tasks.RegisterUiHandlers(tasksUiRouter)
 
-	fmt.Println("Starting Server on port 8000")
-	log.Fatal(http.ListenAndServe(":8000", router))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
+
+	gracefulStop := make(chan os.Signal)
+	signal.Notify(gracefulStop, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-gracefulStop
+		fmt.Println("Shutting Down..")
+		os.Exit(1)
+	}()
+
+	fmt.Println("Starting Server on port 8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func homeHandler(writer http.ResponseWriter, _ *http.Request) {

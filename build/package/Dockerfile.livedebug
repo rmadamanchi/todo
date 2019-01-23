@@ -1,0 +1,14 @@
+FROM golang:1.11 AS delve-stage
+ENV CGO_ENABLED 0
+RUN go get github.com/derekparker/delve/cmd/dlv
+
+FROM golang:1.11
+ENV CGO_ENABLED 0
+ENV GOFLAGS "-mod=vendor"
+COPY --from=delve-stage /go/bin/dlv /usr/local/bin/
+
+EXPOSE 8080 10001
+VOLUME ["/goprojects/todo"]
+WORKDIR /goprojects/todo
+
+CMD ["/usr/local/bin/dlv", "debug", "--listen=:10001", "--headless=true", "--api-version=2", "--output=/tmp/todo", "cmd/todo/main.go"]
