@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-set ex
 export K8S_NAMESPACE=todo
 kubectl get namespace ${K8S_NAMESPACE} >/dev/null || kubectl create namespace ${K8S_NAMESPACE}
 
-kubectl delete pod todo
+kubectl delete pod todo || true
 
 cat <<EOF | kubectl create --namespace=${K8S_NAMESPACE} -f -
 apiVersion: v1
@@ -20,4 +19,4 @@ spec:
 EOF
 
 sleep 2s
-kubetail todo
+./scripts/minikube-tail.sh

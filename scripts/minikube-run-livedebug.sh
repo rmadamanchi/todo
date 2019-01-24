@@ -1,35 +1,42 @@
 #!/usr/bin/env bash
-set ex
 export K8S_NAMESPACE=todo
 kubectl get namespace ${K8S_NAMESPACE} >/dev/null || kubectl create namespace ${K8S_NAMESPACE}
 
-kubectl delete pod todo
+kubectl delete rs todo || true
 
 cat <<EOF | kubectl create --namespace=${K8S_NAMESPACE} -f -
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: ReplicaSet
 metadata:
   name: todo
   labels:
     app: todo
 spec:
-  containers:
-  - name: todo
-    image: todo:livedebug
-    imagePullPolicy: Never
-    env:
-    - name: GO111MODULE
-      value: "on"
-    - name: CGO_ENABLED
-      value: "0"
-    volumeMounts:
-    - mountPath: "/goprojects"
-      name: goprojects
-  volumes:
-  - name: goprojects
-    hostPath:
-      path: "/goprojects"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  template:
+    metadata:
+      name: todo
+      labels:
+        app: todo
+    spec:
+      containers:
+      - name: todo
+        image: todo:livedebug
+        imagePullPolicy: Never
+        env:
+        - name: CGO_ENABLED
+          value: "0"
+        volumeMounts:
+        - mountPath: "/goprojects/todo"
+          name: goproject
+      volumes:
+      - name: goproject
+        hostPath:
+          path: "/goprojects/todo"
 EOF
 
 sleep 2s
-kubetail todo
+./scripts/minikube-tail.sh
