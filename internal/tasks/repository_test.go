@@ -3,7 +3,7 @@ package tasks
 import "testing"
 
 func TestMemoryMapRepository(t *testing.T) {
-	repository := NewRepository(MemoryMap)
+	repository, _ := NewRepository(MemoryMap)
 
 	repository.create(&Task{Title: "Get Milk"})
 	repository.create(&Task{Title: "Get Bread"})
